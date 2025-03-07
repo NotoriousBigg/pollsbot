@@ -98,19 +98,18 @@ async def auto_poll():
         chats = await get_chats()  # Get all stored chats
         if not chats:
             print("⚠️ No groups/channels found. Waiting...")
-            await asyncio.sleep(1800)
             continue
 
         data = await get_http_data(BASE_URL)
         if data is None:
             print("⚠️ API Error. Retrying in 30 minutes...")
-            await asyncio.sleep(10)
+            await asyncio.sleep(1800)
             continue
 
         poll_data = await get_poll_data(data)
         if None in poll_data:
             print("⚠️ Failed to fetch poll data. Retrying in 30 minutes...")
-            await asyncio.sleep(10)
+            await asyncio.sleep(1800)
             continue
 
         quiz, options, correct_index, explanation = poll_data
@@ -126,7 +125,7 @@ async def auto_poll():
                     is_anonymous=False
                 )
 
-                await asyncio.sleep(10)
+                await asyncio.sleep(1800)
                 await Prime.delete_message(chat_id, message_id=msg.message_id)
             except Exception as e:
                 print(f"⚠️ Failed to send poll to {chat_id}: {e}")
