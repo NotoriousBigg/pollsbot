@@ -17,7 +17,7 @@ BASE_URL = "https://quizapi.io/api/v1/questions"
 # start async telebot
 Prime = AsyncTeleBot(TOKEN)
 
-DB_FILE = 'prime.db'
+DB_FILE = 'DB_FILE = "/app/data/prime.db"' # change this to prime.db if you are running this code in your vps or localhost.
 
 # Create database
 def init_db():

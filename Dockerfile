@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y curl wget
 COPY . .
 
 COPY requirements.txt /app
+RUN mkdir -p /app/data
+VOLUME /app/data
+
+RUN if [ -f "/app/prime.db" ]; then mv /app/prime.db /app/data/; fi
 
 RUN pip install -r requirements.txt
 
