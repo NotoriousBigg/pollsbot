@@ -3,3 +3,4 @@ httpx
 pyTelegramBotAPI
 python-dotenv
 aiohttp
+motor

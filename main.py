@@ -2,62 +2,42 @@ import asyncio
 
 from telebot.async_telebot import AsyncTeleBot
 from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
 
 import os
 import httpx
-import sqlite3
 
 load_dotenv()
 
 # tg bot token
 TOKEN = os.getenv('BOT_TOKEN') # get token from bot father
 QUIZ_API_KEY = os.getenv('QUIZ_API_KEY') # get your api key from https://quizapi.io
+MONGO_URI = os.getenv('MONGO_URI')
 BASE_URL = "https://quizapi.io/api/v1/questions"
 
 # start async telebot
 Prime = AsyncTeleBot(TOKEN)
 
+# connect mongodb
+
+client = AsyncIOMotorClient(MONGO_URI)
+db = client['alanturingbot']
+chats_collection = db["chats"]
+
 DB_FILE = 'DB_FILE = "/app/data/prime.db"' # change this to prime.db if you are running this code in your vps or localhost.
 
-# Create database
-def init_db():
-    """Initialize the database."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS chats (
-            chat_id INTEGER PRIMARY KEY
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-# database functions
-
 async def add_chat(chat_id):
-    """Add a chat to the database if not already added."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO chats (chat_id) VALUES (?)", (chat_id,))
-    conn.commit()
-    conn.close()
+    """Add a new chat to the database if it doesn't already exist."""
+    if not await chats_collection.find_one({"chat_id": chat_id}):
+        await chats_collection.insert_one({"chat_id": chat_id})
 
 async def remove_chat(chat_id):
-    """Remove a chat from the database when bot is removed."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM chats WHERE chat_id = ?", (chat_id,))
-    conn.commit()
-    conn.close()
+    """Remove a chat from the database."""
+    await chats_collection.delete_one({"chat_id": chat_id})
 
-async def get_chats():
-    """Get all chat IDs from the database."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT chat_id FROM chats")
-    chats = [row[0] for row in cursor.fetchall()]
-    conn.close()
-    return chats
+async def get_all_chats():
+    """Get a list of all chat IDs from the database."""
+    return [chat["chat_id"] for chat in chats_collection.find()]
 
 # Function for http requests
 async def get_http_data(url):
@@ -95,8 +75,8 @@ async def get_poll_data(data: {}):
 
 async def auto_poll():
     while True:
-        chats = await get_chats()  # Get all stored chats
-        if not chats:
+        chat_ids = get_all_chats() # Get all stored chats
+        if not chat_ids:
             print("⚠️ No groups/channels found. Waiting...")
             continue
 
@@ -113,7 +93,7 @@ async def auto_poll():
             continue
 
         quiz, options, correct_index, explanation = poll_data
-        for chat_id in chats:
+        for chat_id in chat_ids:
             try:
                 msg = await Prime.send_poll(
                     chat_id=chat_id,
@@ -198,7 +178,6 @@ async def left_chat_handler(message):
 
 async def main():
     print("🚀 Bot started. Sending auto-polls...")
-    init_db()
     asyncio.create_task(auto_poll())
     await Prime.infinity_polling()
 
