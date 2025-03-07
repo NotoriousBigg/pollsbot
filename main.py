@@ -75,7 +75,7 @@ async def get_poll_data(data: {}):
 
 async def auto_poll():
     while True:
-        chat_ids = get_all_chats() # Get all stored chats
+        chat_ids = await get_all_chats() # Get all stored chats
         if not chat_ids:
             print("⚠️ No groups/channels found. Waiting...")
             continue
