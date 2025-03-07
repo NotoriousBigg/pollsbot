@@ -36,8 +36,12 @@ async def remove_chat(chat_id):
     await chats_collection.delete_one({"chat_id": chat_id})
 
 async def get_all_chats():
-    """Get a list of all chat IDs from the database."""
-    return [chat["chat_id"] for chat in chats_collection.find()]
+    """Fetch all chat IDs asynchronously from MongoDB."""
+    chat_ids = []
+    async for chat in chats_collection.find({}):
+        chat_ids.append(chat["chat_id"])
+    return chat_ids
+
 
 # Function for http requests
 async def get_http_data(url):
