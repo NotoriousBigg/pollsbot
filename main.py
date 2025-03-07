@@ -24,7 +24,6 @@ client = AsyncIOMotorClient(MONGO_URI)
 db = client['alanturingbot']
 chats_collection = db["chats"]
 
-DB_FILE = 'DB_FILE = "/app/data/prime.db"' # change this to prime.db if you are running this code in your vps or localhost.
 
 async def add_chat(chat_id):
     """Add a new chat to the database if it doesn't already exist."""
