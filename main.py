@@ -173,8 +173,7 @@ async def poll_handler(message):
 async def new_chat_handler(message):
     chat_id = message.chat.id
     await add_chat(chat_id)
-    await Prime.send_message(chat_id, "✅ Thanks for adding me to your group. I will be sending polls after 30 minutes.")
-    await auto_poll()
+    await Prime.send_message(chat_id, "✅ Thanks for the add. I will be sending tech polls after 30 minutes.")
 
 # Remove chat from DB when bot is removed
 @Prime.message_handler(content_types=['left_chat_member'])
