@@ -121,7 +121,10 @@ async def start_handler(message):
     first_name = message.from_user.first_name
     await Prime.send_message(
         message.chat.id,
-        f"Hello {first_name}, Welcome to QUIZ BOT"
+        f"Hello {first_name}, Welcome to Alan Turing Bot"
+        f"I send random polls to your groups and channels. All you have to do is to add me to your group/channel and I will start posting "
+        f"immediately. Also, You can send the /poll command on your private chat and I will be sending you random tech quizes after 30 minutes.\n"
+        f"\nJoin @InfinityTechBots for updates. For support, contact @RealOptimusPrimeBot"
     )
 
 # poll command handler
