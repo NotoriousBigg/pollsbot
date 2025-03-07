@@ -2,3 +2,4 @@ asyncio
 httpx
 pyTelegramBotAPI
 python-dotenv
+aiohttp
